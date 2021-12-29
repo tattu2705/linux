@@ -1,0 +1,112 @@
+conky.config = {
+
+	--Various settings
+
+	background = false,
+	cpu_avg_samples = 2,
+	diskio_avg_samples = 10,
+	double_buffer = true,
+	if_up_strictness = 'address',
+	net_avg_samples = 2,
+	no_buffers = true,
+	temperature_unit = 'celsius',
+	update_interval = 2,
+	imlib_cache_size = 0,
+
+	--Placement
+
+	alignment = 'top_right',
+	gap_x = 20,
+	gap_y = 50,
+	minimum_height = 1080,
+	minimum_width = 280,
+	maximum_width = 300,
+
+	--Graphical
+
+	border_inner_margin = 10,
+	border_outer_margin = 10,
+	draw_borders = false,
+	draw_graph_borders = true,
+	draw_shades = false,
+	draw_outline = false,
+
+	--Textual
+	
+	format_human_readable = true,
+	max_text_width = 0,
+	short_units = true,
+	use_xft = true,
+	xftalpha = 1,
+	font = 'Consolas:size=11',
+
+	--Windows
+
+	own_window = true,
+	-- Lambo: 252525
+	-- Solarized: 002B36
+	own_window_colour = '252525',
+	own_window_argb_value = 240,
+	own_window_argb_visual = true,
+	own_window_type = 'desktop',-- # options are: normal/override/dock/desktop/panel
+
+	--Colours
+	-- Lambo: 9D9D9D
+	-- Solarized: #268BD2
+	default_color = '#4287f5',                                          -- default color and border color
+        color1 = '#4287f5',                                                 -- title_color
+        color2 = '#4287f5',                                                -- top memory or processes, graphs
+        color3 = '#4287f5',                                                -- text color
+};
+
+conky.text = [[
+	${color1}${alignc}${font Consolas:size=40}${time %H:%M}${font}
+	${color1}${voffset 5}${alignc}${font Droid Sans Mono:size=15}${time %A %d %B %Y}${font}
+	${color1}${alignc}------------
+
+
+
+	${color1}${font Consolas:bold:size=11}| Baterry |-( ${battery_percent}% )-${battery_bar 12}${font}
+	${color1}|_${voffset 11}${font Consolas:size=9}|_Status: ${execi 1 acpi -b | awk "{print $1}" | sed 's/\([^:]*\): \([^,]*\), \([0-9]*\)%.*/\2/'}${font}
+	${color1}  ${font Consolas:size=9}|_Uptime: ${uptime}${font}
+	${color1}  ${font Consolas:size=9}|_Time left (If discharged): ${battery_time BAT0} ${font}
+	
+	${color1}${font Consolas:bold:size=11}| System info |${hr 1}${font}
+	${color1}|_${voffset 11}${font Consolas:size=9}|_Distro: ${distribution} (${exec hostnamectl | grep "Architecture:" | awk '{print $2}'})${font}
+	${color1}  ${font Consolas:size=9}|_Kernel:${exec hostnamectl | grep "Kernel" | cut -d ":" -f2}${font}
+	${color1}  ${font Consolas:size=9}|_Vendor: ${exec hostnamectl | grep "Vendor" | awk '{print $3 " " $4}'}${font}
+	${color1}  ${font Consolas:size=9}|_Model: ${exec hostnamectl | grep "Model" | awk '{print $3 " " $4}'}${font}
+
+	${color1}${font Consolas:bold:size=11}| CPU |-( ${cpu}% )-${cpubar 12}${font}
+	${color1}|_${voffset 11}${font Consolas:size=9}|_Model: ${exec lscpu | grep "Model name" | sed -r 's/Model name:\s{1,}(.*) CPU .*z\s*/\1/g'}${font}
+	${color1}  ${font Consolas:size=9}|_CPU Min: ${exec lscpu | egrep 'min' | awk '{printf int($NF)}'}MHz${font}
+	${color1}  ${font Consolas:size=9}|_CPU Max: ${exec lscpu | egrep 'max' | awk '{printf int($NF)}'}MHz${font}
+	${color1}  ${font Consolas:size=9}|_Cores: ${exec lscpu | grep -e "^CPU(" | awk '{print $2}'} (${exec lscpu | grep -e "^Model name" | awk '{print $NF}'})${font}
+	${color1}  ${font Consolas:size=9}|_Temp: ${execi -1 sensors | grep CPU | awk '{print $2}'}${font}
+	
+	${color1}${font Consolas:bold:size=11}| Mem |-( ${memperc}% )-${membar 12}${font}
+	${color1}|_${voffset 11}${font Consolas:size=9}|_Usage: ${mem}/${memmax}${font}
+	${color1}  ${font Consolas:size=9}|_|Processes| Name $alignr MEM${font}
+	${color1}  ${font Consolas:size=9}            |_${top name 1} $alignr ${top mem 1}%${font}
+	${color1}  ${font Consolas:size=9}            |_${top name 2} $alignr ${top mem 2}%${font}
+	${color1}  ${font Consolas:size=9}            |_${top name 3} $alignr ${top mem 3}%${font}
+	${color1}  ${font Consolas:size=9}            |_${top name 4} $alignr ${top mem 4}%${font}
+	${color1}  ${font Consolas:size=9}            |_${top name 5} $alignr ${top mem 5}%${font}
+
+	${color1}${font Consolas:bold:size=11}| Swap |-( ${swapperc}% )-${swapbar 12}${font}
+	${color1}|_${voffset 11}${font Consolas:size=9}|_Usage: ${swap}/${swapmax}${font}
+
+	${color1}${font Consolas:bold:size=11}| Root filesystem |-( ${fs_used_perc /}% )-${fs_bar 12}${font}
+	${color1}|_${voffset 11}${font Consolas:size=9}|_Usage: ${fs_used /}/${fs_size}${font}
+	${color1}  ${font Consolas:size=9}|_[Read] ${alignr}[Write]${font}
+	${color1}  ${font Consolas:size=9}  ${diskiograph_read 50,130 7fff00 ff0000 -t} ${alignr}${diskiograph_write 50,130 7fff00 ff0000 -t}${font}
+
+	${color1}${font Consolas:bold:size=11}| Network |${hr 1}${font}
+	${if_up wlp3s0}${color1}|_${voffset 11}${font Consolas:size=9}|_WLAN:${font}
+	${color1}  ${font Consolas:size=9}|_Down: ${downspeedf wlp3s0} kB/s${alignr}Up: ${upspeedf wlp3s0} kB/s${font}
+	${color1}  ${font Consolas:size=9}  ${downspeedgraph wlp3s0 50,130 7fff00 ff0000 -t} ${alignr}${upspeedgraph wlp3s0 50,130 7fff00 ff0000 -t}${font}
+	${else}${if_up enp2s0}${color1}|_${voffset 11}${font Consolas:size=9}|_LAN:${font}
+	${color1}  ${font Consolas:size=9}|_Down: ${downspeedf enp2s0} kB/s${alignr}Up: ${upspeedf enp2s0} kB/s${font}
+	${color1}  ${font Consolas:size=9}  ${downspeedgraph enp2s0 50,130 7fff00 ff0000 -t} ${alignr}${upspeedgraph enp2s0 50,130 7fff00 ff0000 -t}${font}
+	${endif}
+]]
