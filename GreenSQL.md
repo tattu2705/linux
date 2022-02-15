@@ -29,7 +29,7 @@ chkconfig mysqld on
 ```
 
 ```bash
-service mysql start
+service mysqld start
 ```
 
 Start `mysql_secure_installation`, set up MySQL's root password:
