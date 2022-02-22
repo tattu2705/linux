@@ -5,7 +5,7 @@
 Get the Base repo file:
 
 ```bash
-wget https://phucdc-noob.github.io/CentOS-Base.repo -O /etc/yum.repo.d/CentOS-Base.repo
+wget https://raw.githubusercontent.com/phucdc-noob/Linux/main/CentOS-Base.repo -O /etc/yum.repo.d/CentOS-Base.repo
 ```
 
 Clean yum and update:
@@ -45,7 +45,7 @@ mysql_secure_installation
 Download the tar file:
 
 ```bash
-wget https://phucdc-noob.github.io/greensql-fw1.3.0.tar.gz
+wget https://github.com/phucdc-noob/Linux/raw/main/greensql-fw1.3.0.tar.gz
 ```
 
 Extract it:
