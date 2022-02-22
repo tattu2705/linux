@@ -117,3 +117,34 @@ tail -f /var/log/greensql.log
 
 > If output have only 1 line that have "Application started", bravo ~~~
 > If there are some errors happens? Search yourself 
+
+- Setup web for greensql-console:
+
+```bash
+cd
+cp -r greensql-console /var/www/html
+cp /usr/share/greensql-fw/config.php /var/www/html/greensql-console/
+chown -R apache:apache /var/www/html/greensql-console
+chmod -R 755 /var/www/html/greensql-console
+```
+
+- Install EPEL release:
+
+```bash
+yum install -y epel-release; yum update -y
+```
+
+- Install PHP modules for httpd:
+
+```bash
+yum install -y php-cli php-devel php-gd php-mbstring php-pear php-pecl-apc php-soap php-mcrypt php-mbstring php-mysql php-fpm
+```
+
+- Start `httpd`:
+
+```bash
+chkconfig httpd on
+service httpd start
+```
+
+- Now, open Firefox then go to `http://localhost/greensql-console`, login with `admin:pwd`
