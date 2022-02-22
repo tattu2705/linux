@@ -5,7 +5,7 @@
 Get the Base repo file:
 
 ```bash
-wget https://raw.githubusercontent.com/phucdc-noob/Linux/main/CentOS-Base.repo -O /etc/yum.repo.d/CentOS-Base.repo
+wget https://raw.githubusercontent.com/phucdc-noob/Linux/main/CentOS-Base.repo -O /etc/yum.repos.d/CentOS-Base.repo
 ```
 
 Clean yum and update:
