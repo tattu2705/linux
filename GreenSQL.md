@@ -124,8 +124,13 @@ tail -f /var/log/greensql.log
 cd
 cp -r greensql-console /var/www/html
 cp /usr/share/greensql-fw/config.php /var/www/html/greensql-console/
-chown -R apache:apache /var/www/html/greensql-console
+chown -R apache /var/www/html/greensql-console
 chmod -R 755 /var/www/html/greensql-console
+chcon -R -t httpd_sys_content_t /var/www/html/greensql-console
+chcon -R -t httpd_sys_rw_content_t /var/www/html/greensql-console
+chcon -t httpd_sys_rw_content_t /var/log/greensql.log 
+chcon -t httpd_sys_content_t /var/log/greensql.log
+chmod 744 /var/log/greensql.log
 ```
 
 - Install EPEL release:
