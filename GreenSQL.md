@@ -121,7 +121,6 @@ tail -f /var/log/greensql.log
 - Setup web for greensql-console:
 
 ```bash
-cd
 cp -r greensql-console /var/www/html
 cp /usr/share/greensql-fw/config.php /var/www/html/greensql-console/
 chown -R apache /var/www/html/greensql-console
