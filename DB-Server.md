@@ -105,7 +105,7 @@ mysql -u <username> -p -h <vmnet3_IP_of_DB_Server>
 ```bash 
 iptables --flush
 service iptables save
-iptables -A INPUT -p tcp --dport 3306 -j ACCEPT
+iptables -A INPUT -p tcp --dport 3305 -j ACCEPT
 service iptables save
 service iptables stop
 service iptables start
