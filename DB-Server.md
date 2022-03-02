@@ -2,17 +2,18 @@
 
 > You need to setup mysql before following this instruction.
 
-![image](https://user-images.githubusercontent.com/82533607/156400416-deb3e2fc-4ac3-4d70-87a3-8415d76dbd64.png)
+![image](https://user-images.githubusercontent.com/82533607/156409016-3ac303d5-04f7-449f-a9d6-0b99175dcb14.png)
+
 
 ### Requirements
 
 Set up 2 host-only network adapter `vmnet2` and `vmnet3` in VMWare (Edit -> Virtual Network Editor), for example, my settings:
 
-![image](https://user-images.githubusercontent.com/82533607/156380971-70a68209-563e-41fd-99a9-a02ad2224485.png)
+![image](https://user-images.githubusercontent.com/82533607/156409162-d593c931-fad3-455b-8a62-8793a5f4925f.png)
 
 * In GreenSQL's server, use 2 adapter `vmnet2` and `vmnet3`:
 
-![image](https://user-images.githubusercontent.com/82533607/156381563-933c713f-8eb4-4f11-9b4b-5cf90d143ef9.png)
+![image](https://user-images.githubusercontent.com/82533607/156408892-3ef60ef6-8ba3-41dc-b01c-afc7f78a8c7c.png)
 
 > We will use `vmnet2` address for clients to remote access, `vmnet3` to connect to DB Server.
 
@@ -104,7 +105,7 @@ mysql -u <username> -p -h <vmnet3_IP_of_DB_Server>
 ```bash 
 iptables --flush
 service iptables save
-iptables -A INPUT -p tcp --dport 3305 -j ACCEPT
+iptables -A INPUT -p tcp --dport 3306 -j ACCEPT
 service iptables save
 service iptables stop
 service iptables start
@@ -120,4 +121,4 @@ service iptables start
 mysql -u <username> -p -h <vmnet2_IP_GreenSQL_Server> -P 3305
 ```
 
-![image](https://user-images.githubusercontent.com/82533607/156391067-2ef7072a-6b46-4f89-9288-5423c33c10a3.png)
+![image](https://user-images.githubusercontent.com/82533607/156409521-54255299-82bc-4a1b-ab7b-e93e7967409f.png)
