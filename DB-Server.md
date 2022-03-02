@@ -2,7 +2,7 @@
 
 > You need to setup mysql before following this instruction.
 
-![image](https://user-images.githubusercontent.com/82533607/156397572-48e376af-12be-475e-b9fb-1364229c2670.png)
+![image](https://user-images.githubusercontent.com/82533607/156400416-deb3e2fc-4ac3-4d70-87a3-8415d76dbd64.png)
 
 ### Requirements
 
