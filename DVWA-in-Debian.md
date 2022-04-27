@@ -57,9 +57,21 @@ sudo apt update -y && sudo apt upgrade -y
 
   ```bash
   sudo unzip ~/Downloads/DVWA-master.zip -d /var/www/html/
+  ```
+  
+  ```bash
   sudo mv /var/www/html/DVWA-master/ /var/www/html/dvwa
+  ```
+  
+  ```bash
   sudo mv /var/www/html/dvwa/config/config.inc.php.dist /var/www/html/dvwa/config/config.inc.php
+  ```
+  
+  ```bash
   sudo sed -i 's,allow_url_include = Off,allow_url_include = On,g' /etc/php/<php_version>/apache2/php.ini
+  ```
+  
+  ```bash
   sudo systemctl enable --now apache2
   ```
   
