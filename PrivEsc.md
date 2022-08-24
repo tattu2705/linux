@@ -2,7 +2,7 @@
 
 Điều đầu tiên cần làm là check xem user hiện tại có quyền gì không? Được như bên dưới thì ngon:
 
-```terminal
+```console
 $ sudo -l
 User example may run the following commands on verlaine:
    ... NOPASSWD: /bin/bash
