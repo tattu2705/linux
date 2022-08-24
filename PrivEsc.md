@@ -4,7 +4,7 @@
 
 ```console
 $ sudo -l
-User example may run the following commands on verlaine:
+User example may run the following commands on localhost:
    ... NOPASSWD: /bin/bash
    ...
 ```
