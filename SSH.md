@@ -1,4 +1,4 @@
-Use SSH key to connect to remote server:
+## Use SSH key to connect to remote server:
 
 - Generate SSH Key pair in local machine:
 
