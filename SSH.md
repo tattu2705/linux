@@ -26,10 +26,10 @@ The key's randomart image is:
 +----[SHA256]-----+
 ```
 
-- Send `remote-server-key.pub` to `user@remote-server:~/.ssh/` by `scp` or anything fucking thing.
+- Send `remote-server-key.pub` to `user@remote-server:~` by `scp` or anything fucking thing.
 
 ```console
-user@localhost:$ scp remote-server-key.pub user@remote-server:~/.ssh 
+user@localhost:$ scp remote-server-key.pub user@remote-server:~ 
 The authenticity of host 'remote-server' can't be established.
 ECDSA key fingerprint is SHA256:<a random string>.
 Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
@@ -38,4 +38,14 @@ user@remote-server's password:
 remote-server-key.pub                                                                                                       100%  740     1.2MB/s   00:00
 ```
 
-- Try to connect to server by normal SSH.
+- In remote server, append content of `remote-server-key.pub` to `/home/user/.ssh/authorized_keys`:
+
+```console 
+user@remote-server:$ cat remote-server-key.pub >> ~/.ssh/authorized_keys
+```
+
+- Now, in local machine, try to connect to remote server:
+
+```console
+user@localhost:$ ssh -i /home/user/remote-server-key user@remote-server
+```
