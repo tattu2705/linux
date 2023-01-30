@@ -1,5 +1,13 @@
 # i3 configurations
 
-### Rofi:
+- rofi:
+  - https://github.com/adi1090x/rofi
 
-- https://github.com/adi1090x/rofi
+- Install `yay`
+
+- Install `polybar-git`:
+
+```shell
+yay -S polybar-git
+```
+
