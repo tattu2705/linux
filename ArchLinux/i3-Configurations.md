@@ -11,3 +11,6 @@
 yay -S polybar-git
 ```
 
+- Polybar customizations:
+
+  - https://github.com/adi1090x/polybar-themes
