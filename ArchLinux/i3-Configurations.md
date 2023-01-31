@@ -35,3 +35,6 @@ yay -S polybar-git
   ```shell
   exec --no-startup-id vmware-user &
   ```
+  
+- Kitty terminal
+  - https://github.com/dexpota/kitty-themes
