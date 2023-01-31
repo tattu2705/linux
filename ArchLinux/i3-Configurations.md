@@ -22,3 +22,16 @@ yay -S polybar-git
 
 - fish:
   - https://github.com/oh-my-fish/oh-my-fish
+
+- open-vm-tools
+
+  ```shell
+  sudo pacman -S open-vm-tools gtkmm3 --noconfirm --needed
+  sudo systemctl enable --now vmtoolsd.service vmware-vmblock-fuse.service
+  ```
+  
+  Add this line to i3 config file:
+  
+  ```shell
+  exec --no-startup-id vmware-user &
+  ```
