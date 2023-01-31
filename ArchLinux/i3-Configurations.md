@@ -49,32 +49,31 @@ sudo mkswap --label zram0 /dev/zram0
 sudo swapon --priority=100 /dev/zram0
 ```
 
-  - config files:
-  ```shell
-  # /etc/modules-load.d/zram.conf
-  zram
-  ```
-  
-  ```shell
-  # /etc/modules-load.d/zram.conf
-  options zram num_devices=1
-  ```
-  
-  ```shell
-  # /etc/udev/rules.d/99-zram.rules
-  KERNEL=="zram0", ATTR{comp_algorithm}="zstd", ATTR{disksize}="4096M", RUN="/usr/bin/mkswap /dev/zram0", TAG+="systemd"
-  ```
-  
-  ```shell
-  # /etc/fstab
-  /dev/zram0	none	swap	sw,pri=100	0 0
-  ```
-  
-  ```shell
-  # /etc/mkinitcpio.conf (add to MODULE=())
-  MODULES=(zram)
-  ```
-  
+```shell
+# /etc/modules-load.d/zram.conf
+zram
+```
+
+```shell
+# /etc/modules-load.d/zram.conf
+options zram num_devices=1
+```
+
+```shell
+# /etc/udev/rules.d/99-zram.rules
+KERNEL=="zram0", ATTR{comp_algorithm}="zstd", ATTR{disksize}="4096M", RUN="/usr/bin/mkswap /dev/zram0", TAG+="systemd"
+```
+
+```shell
+# /etc/fstab
+/dev/zram0	none	swap	sw,pri=100	0 0
+```
+
+```shell
+# /etc/mkinitcpio.conf (add to MODULE=())
+MODULES=(zram)
+```
+
 ```shell
 sudo mkinitcpio -p linux
 ```
